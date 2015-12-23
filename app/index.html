@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<title>AgriEnents</title>
+	<script src="http://www.dmi.unict.it/~longo/sparql_suite/sparql_processor.js"></script>
+</head>
+
+<body>
+	<div id="container">
+		<div id="mainpic">
+			<h1>Agri<span class="off">Events</span></h1>
+			<h2>A template by Bryant Smith</h2>
+		</div>
+
+		<div id="menu">
+			<ul>
+				<li class="menuitem"><a href="index.html">Home</a></li>
+				<li class="menuitem"><a href="organizer.html">Organizzatore</a></li>
+				<li class="menuitem"><a href="farmer.html">Agricoltore</a></li>
+			</ul>
+		</div>
+
+		<div id="content">
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+
+			<fieldset>
+				<legend>Eventi mercato con agricoltori e frutti</legend>
+
+				<div id="spinner" class="spinner" style="display:none">
+					<div class="rect1"></div>
+					<div class="rect2"></div>
+					<div class="rect3"></div>
+					<div class="rect4"></div>
+					<div class="rect5"></div>
+				</div>
+				<ul id="resultsList">
+				</ul>
+				<button id="searchEventsFarmersFruitsAll" onclick="searchEventsFarmersFruits(this, 'tutti');">Cerca tutti</button></br>
+				<button id="searchEventsFarmersFruitsFuture" onclick="searchEventsFarmersFruits(this, 'futuri');">Cerca futuri</button>
+			</fieldset>
+
+			<script>
+				function searchEventsFarmersFruits(srcElement, typeSearch){
+					document.getElementById("spinner").style.display = "block";
+					document.getElementById("searchEventsFarmersFruitsAll").disabled = true;
+					document.getElementById("searchEventsFarmersFruitsFuture").disabled = true;
+
+					var resultsList=document.getElementById("resultsList");
+					resultsList.innerHTML = "";
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(resultsList, summary){
+						this.n=0;
+						this.resultsList=resultsList;
+						this.summary=summary;
+
+						//Selezione Eventi Agricoltori Frutti
+						this.query = "PREFIX eve:<http://purl.org/NET/c4dm/event.owl#>"
+									+"PREFIX gr:<http://purl.org/goodrelations/v1#>"
+									+"PREFIX foaf:<http://xmlns.com/foaf/0.1/>"
+									+"PREFIX time:<http://www.w3.org/2006/time#>"
+									+"PREFIX dc:<http://purl.org/dc/elements/1.1/>"
+									+"PREFIX locn:<http://www.w3.org/ns/locn#>"
+									+"SELECT DISTINCT ?event ?di ?address ?person ?offering ?fruit where {"
+									+"	?event a eve:Event ."
+									+"	?offering a gr:Offering ."
+									+"	?person a foaf:Person ."
+									+"	?fruit a [] ." //TODO non usare blanks
+									+"	?addr a locn:Address ."
+									+"	?event eve:product ?offering ."
+									+"	?person gr:offers ?offering ."
+									+"	?offering gr:includes ?fruit ."
+									+"	?event locn:address ?addr ."
+									+"	?addr locn:fullAddress ?address ."
+									+"	?event eve:time ?time ."
+									+"	?time time:hasBeginning ?datei ." //TODO check
+									+"	?datei dc:date ?di"
+									+(typeSearch == "futuri" ? " . bind(now() as ?date) . FILTER (?di>?date)" : "")
+									+"} ORDER BY ?di ?event ?person";
+
+						var eventList;
+						var personList;
+						var currentEvent = "";
+						var currentPerson = "";
+
+						//and methods to handle the query results
+						this.process = function(row){
+							var event=row.event.value.substring(row.event.value.indexOf("#")+1);
+							var di=row.di.value;
+							var address=row.address.value.substring(row.address.value.indexOf("#")+1);
+							var person=row.person.value.substring(row.person.value.indexOf("#")+1);
+							var offering=row.offering.value.substring(row.offering.value.indexOf("#")+1);
+							var fruit=row.fruit.value.substring(row.fruit.value.lastIndexOf("/")+1);
+
+							if (event != currentEvent) {
+								var li=document.createElement("li");
+								li.innerHTML=event +" :: "+ di +" :: "+  address;
+								this.resultsList.appendChild(li);
+
+								eventList=document.createElement("ul");
+								li.appendChild(eventList);
+
+								currentEvent = event;
+								currentPerson = "";
+							}
+
+							if (person != currentPerson) {
+								var li=document.createElement("li");
+								li.innerHTML=person;
+								eventList.appendChild(li);
+
+								personList=document.createElement("ul");
+								li.appendChild(personList);
+
+								currentPerson = person;
+							}
+
+							var li=document.createElement("li");
+							li.innerHTML=fruit +" ("+ offering +")";
+							personList.appendChild(li);
+
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							document.getElementById("spinner").style.display = "none";
+							document.getElementById("searchEventsFarmersFruitsAll").disabled = false;
+							document.getElementById("searchEventsFarmersFruitsFuture").disabled = false;
+
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(resultsList, summary));
+					//srcElement.disabled=true;
+				}
+			</script>
+
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+
+			<fieldset>
+				<legend>Eventi mercato in base alla frutta</legend>
+
+				<table cellpadding="3">
+					<tr>
+						<td align="right">Frutta</td>
+						<td><input id="fruit" type="text" style="display:table-cell; width:100%" value="" autofocus></td>
+						<td><button id="searchFruits" onclick="searchFruits(this);">Cerca frutta</button></td>
+					</tr>
+				</table>
+				<div id="spinner2" class="spinner" style="display:none">
+					<div class="rect1"></div>
+					<div class="rect2"></div>
+					<div class="rect3"></div>
+					<div class="rect4"></div>
+					<div class="rect5"></div>
+				</div>
+				<table id="fruitsTable" cellpadding="3">
+				</table>
+
+				<button id="searchEventsByFruitsAll" onclick='searchEventsByFruits(this, "tutti");'>Cerca eventi tutti</button></br>
+				<button id="searchEventsByFruitsFuture" onclick='searchEventsByFruits(this, "futuri");'>Cerca eventi futuri</button>
+
+				<div id="spinner3" class="spinner" style="display:none">
+					<div class="rect1"></div>
+					<div class="rect2"></div>
+					<div class="rect3"></div>
+					<div class="rect4"></div>
+					<div class="rect5"></div>
+				</div>
+				<ul id="resultsList2">
+				</ul>
+			</fieldset>
+
+			<script>
+				function searchFruits(srcElement) {
+					document.getElementById("spinner2").style.display = "block";
+					document.getElementById("searchFruits").disabled = true;
+					document.getElementById("searchEventsByFruitsAll").disabled = true;
+					document.getElementById("searchEventsByFruitsFuture").disabled = true;
+
+					var fruitsTable=document.getElementById("fruitsTable");
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+
+					for(var i=fruitsTable.rows.length; i>0; i--) {
+						fruitsTable.deleteRow(i-1);
+					}
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(fruitsTable, summary){
+						this.n=0;
+						this.fruitsTable=fruitsTable;
+						this.summary=summary;
+
+						var fruit=document.getElementById("fruit").value;
+
+						//Trova URI Frutta
+						this.query = "SELECT DISTINCT ?uri{"
+									+"	?uri a ?c ."
+									+"	FILTER (REGEX(STR(?uri), 'http://dbpedia.org/resource/')) ."
+									+"	FILTER (REGEX(STR(?uri), '" + fruit + "', 'i'))"
+									+"}";
+
+						//and methods to handle the query results
+						this.process = function(row){
+							var tr=document.createElement("tr");
+							var td=document.createElement("td");
+							var value=row.uri.value.substring(row.uri.value.lastIndexOf("/")+1);
+							td.innerHTML="<input type='checkbox' name='fruits' value='" + value + "'/> " + value;
+							tr.appendChild(td);
+							this.fruitsTable.appendChild(tr);
+
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							document.getElementById("spinner2").style.display = "none";
+							document.getElementById("searchFruits").disabled = false;
+							document.getElementById("searchEventsByFruitsAll").disabled = false;
+							document.getElementById("searchEventsByFruitsFuture").disabled = false;
+
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(fruitsTable, summary));
+					//srcElement.disabled=true;
+				}
+
+				function searchEventsByFruits(srcElement, typeSearch){
+					var checkedValues = new Array();
+					var inputElements = document.getElementsByName('fruits');
+					for(var i=0; i<inputElements.length; ++i){
+						if(inputElements[i].checked){
+							checkedValues.push(inputElements[i].value);
+						}
+					}
+					if (checkedValues.length == 0) {
+						alert("Seleziona almeno una frutta!");
+						return;
+					}
+					filterValues = checkedValues.join(" || ?fruit = dbpedia:");
+
+					document.getElementById("spinner3").style.display = "block";
+					document.getElementById("searchFruits").disabled = true;
+					document.getElementById("searchEventsByFruitsAll").disabled = true;
+					document.getElementById("searchEventsByFruitsFuture").disabled = true;
+
+					var resultsList2=document.getElementById("resultsList2");
+					resultsList2.innerHTML = "";
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(resultsList2, summary){
+						this.n=0;
+						this.resultsList2=resultsList2;
+						this.summary=summary;
+
+						//Trova Eventi per Frutta
+						this.query = "PREFIX eve:<http://purl.org/NET/c4dm/event.owl#>"
+									+"PREFIX gr:<http://purl.org/goodrelations/v1#>"
+									+"PREFIX foaf:<http://xmlns.com/foaf/0.1/>"
+									+"PREFIX time:<http://www.w3.org/2006/time#>"
+									+"PREFIX dc:<http://purl.org/dc/elements/1.1/>"
+									+"PREFIX locn:<http://www.w3.org/ns/locn#>"
+									+"PREFIX dbpedia:<http://dbpedia.org/resource/>"
+									+"SELECT DISTINCT ?event ?di ?address ?person ?offering ?fruit where {"
+									+"	?event a eve:Event ."
+									+"	?offering a gr:Offering ."
+									+"	?person a foaf:Person ."
+									+"	?fruit a [] ."
+									+"	?addr a locn:Address ."
+									+"	?event eve:product ?offering ."
+									+"	?person gr:offers ?offering ."
+									+"	?offering gr:includes ?fruit ."
+									+"	?event locn:address ?addr ."
+									+"	?addr locn:fullAddress ?address ."
+									+"	?event eve:time ?time ."
+									+"	?time time:hasBeginning ?datei ."
+									+"	?datei dc:date ?di ."
+									+"	FILTER (?fruit = dbpedia:" + filterValues + ")"
+									+(typeSearch == "futuri" ? " . bind(now() as ?date) . FILTER (?di>?date)" : "")
+									+"} ORDER BY ?di ?event ?person";
+
+						var eventList;
+						var personList;
+						var currentEvent = "";
+						var currentPerson = "";
+
+						//and methods to handle the query results
+						this.process = function(row){
+							var event=row.event.value.substring(row.event.value.indexOf("#")+1);
+							var di=row.di.value;
+							var address=row.address.value.substring(row.address.value.indexOf("#")+1);
+							var person=row.person.value.substring(row.person.value.indexOf("#")+1);
+							var offering=row.offering.value.substring(row.offering.value.indexOf("#")+1);
+							var fruit=row.fruit.value.substring(row.fruit.value.lastIndexOf("/")+1);
+
+							if (event != currentEvent) {
+								var li=document.createElement("li");
+								li.innerHTML=event +" :: "+ di +" :: "+  address;
+								this.resultsList2.appendChild(li);
+
+								eventList=document.createElement("ul");
+								li.appendChild(eventList);
+
+								currentEvent = event;
+								currentPerson = "";
+							}
+
+							if (person != currentPerson) {
+								var li=document.createElement("li");
+								li.innerHTML=person;
+								eventList.appendChild(li);
+
+								personList=document.createElement("ul");
+								li.appendChild(personList);
+
+								currentPerson = person;
+							}
+
+							var li=document.createElement("li");
+							li.innerHTML=fruit +" ("+ offering +")";
+							personList.appendChild(li);
+
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							document.getElementById("spinner3").style.display = "none";
+							document.getElementById("searchFruits").disabled = false;
+							document.getElementById("searchEventsByFruitsAll").disabled = false;
+							document.getElementById("searchEventsByFruitsFuture").disabled = false;
+
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(resultsList2, summary));
+					//srcElement.disabled=true;
+				}
+			</script>
+
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+
+			<div id="footer"><h3><a href="http://www.bryantsmith.com">florida web design</a></div>
+		</div>
+	</div>
+</body>
+</html>

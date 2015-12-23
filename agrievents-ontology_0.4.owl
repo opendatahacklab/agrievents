@@ -1,0 +1,308 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY foaf "http://xmlns.com/foaf/0.1/" >
+    <!ENTITY dbpedia "http://dbpedia.org/resource/" >
+    <!ENTITY time "http://www.w3.org/2006/time#" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY dc "http://purl.org/dc/elements/1.1/" >
+    <!ENTITY gr "http://purl.org/goodrelations/v1#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY eve "http://purl.org/NET/c4dm/event.owl#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY wgs84_pos "http://www.w3.org/2003/01/geo/wgs84_pos#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY agreve "http://www.semanticweb.org/agrievents-ontology#" >
+    <!ENTITY locn "http://www.w3.org/ns/locn#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.semanticweb.org/agrievents-ontology#"
+     xml:base="http://www.semanticweb.org/agrievents-ontology"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:dbpedia="http://dbpedia.org/resource/"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:gr="http://purl.org/goodrelations/v1#"
+     xmlns:agreve="http://www.semanticweb.org/agrievents-ontology#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:eve="http://purl.org/NET/c4dm/event.owl#"
+     xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#"
+     xmlns:time="http://www.w3.org/2006/time#"
+     xmlns:foaf="http://xmlns.com/foaf/0.1/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:locn="http://www.w3.org/ns/locn#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/agrievents-ontology">
+        <owl:imports rdf:resource="http://dbpedia.org/resource/Apple"/>
+        <owl:imports rdf:resource="http://dbpedia.org/resource/Banana"/>
+        <owl:imports rdf:resource="http://dbpedia.org/resource/Grape"/>
+        <owl:imports rdf:resource="http://dbpedia.org/resource/Pear"/>
+        <owl:imports rdf:resource="http://dbpedia.org/resource/Plum"/>
+        <owl:imports rdf:resource="http://dbpedia.org/resource/Strawberry"/>
+        <owl:imports rdf:resource="http://dbpedia.org/resource/Common_fig"/>
+        <owl:imports rdf:resource="http://purl.org/NET/c4dm/event.owl"/>
+        <owl:imports rdf:resource="http://purl.org/goodrelations/v1"/>
+        <owl:imports rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos"/>
+        <owl:imports rdf:resource="http://xmlns.com/foaf/0.1/"/>
+        <owl:imports rdf:resource="http://www.w3.org/ns/locn"/>
+        <owl:versionIRI rdf:resource="http://www.semanticweb.org/agrievents-ontology/0.4"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Antonio_Bianchi -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Antonio_Bianchi">
+        <rdf:type rdf:resource="&foaf;Person"/>
+        <gr:offers rdf:resource="&agreve;Vendita_Antonio_Bianchi_Banana"/>
+        <gr:offers rdf:resource="&agreve;Vendita_Antonio_Bianchi_Common_fig"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Elena_Neri -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Elena_Neri">
+        <rdf:type rdf:resource="&foaf;Person"/>
+        <gr:offers rdf:resource="&agreve;Vendita_Elena_Neri_Apple"/>
+        <gr:offers rdf:resource="&agreve;Vendita_Elena_Neri_Plum"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Giuseppe_Verdi -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Giuseppe_Verdi">
+        <rdf:type rdf:resource="&foaf;Person"/>
+        <gr:offers rdf:resource="&agreve;Vendita_Giuseppe_Verdi_Pear"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Mario_Rossi -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Mario_Rossi">
+        <rdf:type rdf:resource="&foaf;Person"/>
+        <gr:offers rdf:resource="&agreve;Vendita_Mario_Rossi_Strawberry"/>
+        <gr:offers rdf:resource="&agreve;Vendita_Mario_Rossi_Apple"/>
+        <gr:offers rdf:resource="&agreve;Vendita_Mario_Rossi_Grape"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Mercato_Catania -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Mercato_Catania">
+        <rdf:type rdf:resource="&eve;Event"/>
+        <locn:address>
+            <locn:Address rdf:about="&agreve;Mercato_Catania_Address">
+                <rdfs:label>Piazza Stesicoro, 37, 95131, Catania, Italia</rdfs:label>
+                <locn:fullAddress>Piazza Stesicoro, 37, 95131, Catania, Italy</locn:fullAddress>
+                <locn:thoroughfare>Piazza Stesicoro</locn:thoroughfare>
+                <locn:locatorDesignator>37</locn:locatorDesignator>
+                <locn:postCode>95131</locn:postCode>
+                <locn:postName>Catania</locn:postName>
+                <locn:adminUnitL1>IT</locn:adminUnitL1>
+            </locn:Address>
+        </locn:address>
+        <locn:geometry>
+            <locn:Geometry rdf:about="&agreve;Mercato_Catania_Geometry">
+                <wgs84_pos:lat>37.507713</wgs84_pos:lat>
+                <wgs84_pos:long>15.086394</wgs84_pos:long>
+            </locn:Geometry>
+        </locn:geometry>
+        <rdfs:label xml:lang="en">Catania Market</rdfs:label>
+        <rdfs:label xml:lang="it">Mercato Catania</rdfs:label>
+        <rdfs:comment xml:lang="en">A place where you can buy whatever you want.</rdfs:comment>
+        <rdfs:comment xml:lang="it">Un posto dove puoi comprare qualsiasi cosa vuoi.</rdfs:comment>
+        <eve:time rdf:resource="&agreve;Giorno_1_Mercato_Catania"/>
+		<eve:agent rdf:resource="&agreve;Antonio_Bianchi"/>
+		<eve:agent rdf:resource="&agreve;Elena_Neri"/>
+		<eve:agent rdf:resource="&agreve;Giuseppe_Verdi"/>
+		<eve:agent rdf:resource="&agreve;Mario_Rossi"/>
+        <eve:product rdf:resource="&agreve;Vendita_Antonio_Bianchi_Common_fig"/>
+        <eve:product rdf:resource="&agreve;Vendita_Elena_Neri_Apple"/>
+        <eve:product rdf:resource="&agreve;Vendita_Mario_Rossi_Apple"/>
+        <eve:product rdf:resource="&agreve;Vendita_Giuseppe_Verdi_Pear"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Mercato_Ragusa -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Mercato_Ragusa">
+        <rdf:type rdf:resource="&eve;Event"/>
+        <locn:address>
+            <locn:Address rdf:about="&agreve;Mercato_Ragusa_Address">
+                <rdfs:label>Corso Vittorio Veneto, 124, 97100, Ragusa, Italia</rdfs:label>
+                <locn:fullAddress>Corso Vittorio Veneto, 124, 97100, Ragusa, Italy</locn:fullAddress>
+                <locn:thoroughfare>Corso Vittorio Veneto</locn:thoroughfare>
+                <locn:locatorDesignator>124</locn:locatorDesignator>
+                <locn:postCode>97100</locn:postCode>
+                <locn:postName>Ragusa</locn:postName>
+                <locn:adminUnitL1>IT</locn:adminUnitL1>
+            </locn:Address>
+        </locn:address>
+        <locn:geometry>
+            <locn:Geometry rdf:about="&agreve;Mercato_Ragusa_Geometry">
+                <wgs84_pos:lat>36.925096</wgs84_pos:lat>
+                <wgs84_pos:long>14.729130</wgs84_pos:long>
+            </locn:Geometry>
+        </locn:geometry>
+        <eve:time rdf:resource="&agreve;Giorno_1_Mercato_Ragusa"/>
+		<eve:agent rdf:resource="&agreve;Antonio_Bianchi"/>
+		<eve:agent rdf:resource="&agreve;Elena_Neri"/>
+		<eve:agent rdf:resource="&agreve;Mario_Rossi"/>
+        <eve:product rdf:resource="&agreve;Vendita_Antonio_Bianchi_Banana"/>
+        <eve:product rdf:resource="&agreve;Vendita_Elena_Neri_Apple"/>
+        <eve:product rdf:resource="&agreve;Vendita_Elena_Neri_Plum"/>
+        <eve:product rdf:resource="&agreve;Vendita_Mario_Rossi_Strawberry"/>
+        <eve:product rdf:resource="&agreve;Vendita_Mario_Rossi_Grape"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Giorno_1_Mercato_Catania -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Giorno_1_Mercato_Catania">
+        <rdf:type rdf:resource="&time;DateTimeInterval"/>
+        <time:hasEnd rdf:resource="&agreve;Fine_Mercato_Catania"/>
+        <time:hasBeginning rdf:resource="&agreve;Inizio_Mercato_Catania"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Giorno_1_Mercato_Ragusa -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Giorno_1_Mercato_Ragusa">
+        <rdf:type rdf:resource="&time;DateTimeInterval"/>
+        <time:hasEnd rdf:resource="&agreve;Fine_Mercato_Ragusa"/>
+        <time:hasBeginning rdf:resource="&agreve;Inizio_Mercato_Ragusa"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Inizio_Mercato_Catania -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Inizio_Mercato_Catania">
+        <rdf:type rdf:resource="&time;Instant"/>
+        <dc:date rdf:datatype="&xsd;dateTime">2015-04-25T08:30:00+01:00</dc:date>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Inizio_Mercato_Ragusa -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Inizio_Mercato_Ragusa">
+        <rdf:type rdf:resource="&time;Instant"/>
+        <dc:date rdf:datatype="&xsd;dateTime">2015-06-15T09:00:00+01:00</dc:date>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Fine_Mercato_Catania -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Fine_Mercato_Catania">
+        <rdf:type rdf:resource="&time;Instant"/>
+        <dc:date rdf:datatype="&xsd;dateTime">2015-04-25T15:18:00+01:00</dc:date>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Fine_Mercato_Ragusa -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Fine_Mercato_Ragusa">
+        <rdf:type rdf:resource="&time;Instant"/>
+        <dc:date rdf:datatype="&xsd;dateTime">2015-06-15T15:00:00+01:00</dc:date>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Vendita_Antonio_Bianchi_Banana -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Vendita_Antonio_Bianchi_Banana">
+        <rdf:type rdf:resource="&gr;Offering"/>
+        <gr:includes rdf:resource="&dbpedia;Banana"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Vendita_Antonio_Bianchi_Common_fig -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Vendita_Antonio_Bianchi_Common_fig">
+        <rdf:type rdf:resource="&gr;Offering"/>
+        <gr:includes rdf:resource="&dbpedia;Common_fig"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Vendita_Elena_Neri_Apple -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Vendita_Elena_Neri_Apple">
+        <rdf:type rdf:resource="&gr;Offering"/>
+        <gr:includes rdf:resource="&dbpedia;Apple"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Vendita_Elena_Neri_Plum -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Vendita_Elena_Neri_Plum">
+        <rdf:type rdf:resource="&gr;Offering"/>
+        <gr:includes rdf:resource="&dbpedia;Plum"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Vendita_Mario_Rossi_Strawberry -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Vendita_Mario_Rossi_Strawberry">
+        <rdf:type rdf:resource="&gr;Offering"/>
+        <gr:includes rdf:resource="&dbpedia;Strawberry"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Vendita_Mario_Rossi_Apple -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Vendita_Mario_Rossi_Apple">
+        <rdf:type rdf:resource="&gr;Offering"/>
+        <gr:includes rdf:resource="&dbpedia;Apple"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Vendita_Mario_Rossi_Grape -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Vendita_Mario_Rossi_Grape">
+        <rdf:type rdf:resource="&gr;Offering"/>
+        <gr:includes rdf:resource="&dbpedia;Grape"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/agrievents-ontology#Vendita_Giuseppe_Verdi_Pear -->
+
+    <owl:NamedIndividual rdf:about="&agreve;Vendita_Giuseppe_Verdi_Pear">
+        <rdf:type rdf:resource="&gr;Offering"/>
+        <gr:includes rdf:resource="&dbpedia;Pear"/>
+    </owl:NamedIndividual>
+    
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.5.1) http://owlapi.sourceforge.net -->
+

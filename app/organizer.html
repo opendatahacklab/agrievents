@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<title>AgriEnents - Organizzatore</title>
+	<script src="http://www.dmi.unict.it/~longo/sparql_suite/sparql_processor.js"></script>
+</head>
+
+<body>
+	<div id="container">
+		<div id="mainpic">
+			<h1>Agri<span class="off">Events</span></h1>
+			<h2>A template by Bryant Smith</h2>
+		</div>
+
+		<div id="menu">
+			<ul>
+				<li class="menuitem"><a href="index.html">Home</a></li>
+				<li class="menuitem"><a href="organizer.html">Organizzatore</a></li>
+				<li class="menuitem"><a href="farmer.html">Agricoltore</a></li>
+			</ul>
+		</div>
+
+		<div id="content">
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+
+			<fieldset>
+				<legend>Inserisci evento</legend>
+
+				<table cellpadding="3">
+					<tr>
+						<td align="right">Evento</td>
+						<td><input id="event" type="text" style="display:table-cell; width:100%" placeholder= "Mercato_Città" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Città</td>
+						<td><input id="city" type="text" style="display:table-cell; width:100%" placeholder= "Città" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">CAP</td>
+						<td><input id="cap" type="text" style="display:table-cell; width:100%" placeholder= "99999" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Indirizzo</td>
+						<td><input id="address" type="text" style="display:table-cell; width:100%" placeholder= "Corso Italia" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Numero civico</td>
+						<td><input id="addressNumber" type="text" style="display:table-cell; width:100%" placeholder= "999" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Stato</td>
+						<td><input id="state" type="text" style="display:table-cell; width:100%" placeholder= "Italia" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Stato (2 lettere)</td>
+						<td><input id="stateCode" type="text" style="display:table-cell; width:100%" placeholder= "IT" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Latitudine</td>
+						<td><input id="latitude" type="text" style="display:table-cell; width:100%" placeholder= "50.123456" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Longitudine</td>
+						<td><input id="longitude" type="text" style="display:table-cell; width:100%" placeholder= "10.123456" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Data e ora inizio (UTC)</td>
+						<td><input id="beginning" type="text" style="display:table-cell; width:100%" placeholder= "2015-12-31T09:00:00Z" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Data e ora fine (UTC)</td>
+						<td><input id="end" type="text" style="display:table-cell; width:100%" placeholder= "2015-12-31T19:30:00Z" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><button onclick="insertEvent(this);">Inserisci evento</button></td>
+					</tr>
+				</table>
+			</fieldset>
+
+			<script>
+				function insertEvent(srcElement) {
+					var event=document.getElementById("event").value;
+					var city=document.getElementById("city").value;
+					var cap=document.getElementById("cap").value;
+					var address=document.getElementById("address").value;
+					var addressNumber=document.getElementById("addressNumber").value;
+					var state=document.getElementById("state").value;
+					var stateCode=document.getElementById("stateCode").value;
+					var latitude=document.getElementById("latitude").value;
+					var longitude=document.getElementById("longitude").value;
+					var beginning=document.getElementById("beginning").value;
+					var end=document.getElementById("end").value;
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+					var title = document.createElement("h3");
+					title.innerHTML="Inserito";
+					container.insertBefore(title, srcElement);
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(summary){
+						this.n=0;
+						this.summary=summary;
+
+						//Inserisci Evento
+						this.query = "PREFIX eve:<http://purl.org/NET/c4dm/event.owl#>"
+									+"PREFIX agreve:<http://www.semanticweb.org/agrievents-ontology#>"
+									+"PREFIX time:<http://www.w3.org/2006/time#>"
+									+"PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>"
+									+"PREFIX dc:<http://purl.org/dc/elements/1.1/>"
+									+"PREFIX wgs84_pos:<http://www.w3.org/2003/01/geo/wgs84_pos#>"
+									+"PREFIX locn:<http://www.w3.org/ns/locn#>"
+									+"INSERT DATA {"
+									+"	agreve:Inizio_"+event+" a owl:NamedIndividual;"
+									+"							a time:Instant;"
+									+"							dc:date '"+beginning+"'^^xsd:dateTime"
+									+"};"
+									+"INSERT DATA {"
+									+"	agreve:Fine_"+event+" a owl:NamedIndividual;"
+									+"						  a time:Instant;"
+									+"						  dc:date '"+end+"'^^xsd:dateTime"
+									+"};"
+									+"INSERT DATA {"
+									+"	agreve:Giorno_1_"+event+" a owl:NamedIndividual;"
+									+"							  a time:DateTimeInterval;"
+									+"							  time:hasBeginning agreve:Inizio_"+event+";"
+									+"							  time:hasEnd agreve:Fine_"+event
+									+"};"
+									+"INSERT DATA {"
+									+"	agreve:"+event+"_Geometry a owl:NamedIndividual;"
+									+"							  a locn:Geometry;"
+									+"							  wgs84_pos:lat '"+latitude+"';"
+									+"							  wgs84_pos:long '"+longitude+"'"
+									+"};"
+									+"INSERT DATA {"
+									+"	agreve:"+event+"_Address a owl:NamedIndividual;"
+									+"							 a locn:Address;"
+									+"							 rdfs:label '"+address+", "+addressNumber+", "+cap+", "+city+", "+state+"';"
+									+"							 locn:fullAddress '"+address+", "+addressNumber+", "+cap+", "+city+", "+state+"';"
+									+"							 locn:thoroughfare '"+address+"';"
+									+"							 locn:locatorDesignator '"+addressNumber+"';"
+									+"							 locn:postCode '"+cap+"';"
+									+"							 locn:postName '"+city+"';"
+									+"							 locn:adminUnitL1 '"+stateCode+"'"
+									+"};"
+									+"INSERT DATA {"
+									+"	agreve:"+event+" a owl:NamedIndividual;"
+									+"					 a eve:Event;"
+									+"					 locn:address agreve:"+event+"_Address;"
+									+"					 locn:geometry agreve:"+event+"_Geometry;"
+									+"					 eve:time agreve:Giorno_1_"+event
+									+"}";
+
+						//and methods to handle the query results
+						this.process = function(row){
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(summary));
+					//srcElement.disabled=true;
+				}
+			</script>
+
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+
+			<fieldset>
+				<legend>Inserisci agricoltori ad evento</legend>
+
+				Eventi: <select id="selectEvent" onchange="setEvent();">
+				</select></br>
+				<button onclick="searchEvents(this);">Cerca eventi</button>
+
+				<table cellpadding="3">
+					<tr>
+						<td align="right">Evento</td>
+						<td><input id="event2" type="text" style="display:table-cell; width:100%" placeholder= "Mercato_Città" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Agricoltori (separati da una virgola)</td>
+						<td><input id="farmers" type="text" style="display:table-cell; width:100%" placeholder= "Mario_Rossi,Giuseppe_Verdi" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><button onclick="insertFarmers(this);">Inserisci agricoltori</button></td>
+					</tr>
+				</table>
+			</fieldset>
+
+			<script>
+				function searchEvents(srcElement){
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+
+					var selectEvent = document.getElementById("selectEvent");
+					selectEvent.options.length = 0;
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(selectEvent, summary){
+						this.n=0;
+						this.selectEvent=selectEvent;
+						this.summary=summary;
+
+						//define the query
+						this.query = "PREFIX eve:<http://purl.org/NET/c4dm/event.owl#>"
+									+"SELECT DISTINCT ?event {"
+									+"	?event a eve:Event"
+									+"} order by ?event";
+
+						//and methods to handle the query results
+						this.process = function(row){
+							var option = document.createElement("option");
+							option.text = row.event.value.substring(row.event.value.indexOf("#")+1);;
+							this.selectEvent.add(option);
+
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							document.getElementById("selectEvent").selectedIndex = 0;
+							document.getElementById("event2").value = selectEvent.options[selectEvent.selectedIndex].value;
+
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(selectEvent, summary));
+					//srcElement.disabled=true;
+				}
+
+				function setEvent() {
+					var selectEvent = document.getElementById("selectEvent");
+					document.getElementById("event2").value = selectEvent.options[selectEvent.selectedIndex].value;
+				}
+
+				function insertFarmers(srcElement) {
+					var event2=document.getElementById("event2").value;
+					var farmers=document.getElementById("farmers").value.split(",");
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+					var title = document.createElement("h3");
+					title.innerHTML="Inserito";
+					container.insertBefore(title, srcElement);
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(summary){
+						this.n=0;
+						this.summary=summary;
+
+						//Inserisci Agricoltore ad Evento
+						this.query = "PREFIX eve:<http://purl.org/NET/c4dm/event.owl#>"
+									+"PREFIX agreve:<http://www.semanticweb.org/agrievents-ontology#>"
+									+"PREFIX foaf:<http://xmlns.com/foaf/0.1/>";
+
+						for (var i=0; i<farmers.length; i++) {
+							this.query = this.query + "INSERT DATA { agreve:"+farmers[i]+" a owl:NamedIndividual; a foaf:Person };"
+													+ "INSERT DATA { agreve:"+event2+" eve:agent agreve:"+farmers[i]+" };";
+						}
+
+						//and methods to handle the query results
+						this.process = function(row){
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(summary));
+					//srcElement.disabled=true;
+				}
+			</script>
+
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+
+			<div id="footer"><h3><a href="http://www.bryantsmith.com">florida web design</a></div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<title>AgriEnents - Agricoltore</title>
+	<script src="http://www.dmi.unict.it/~longo/sparql_suite/sparql_processor.js"></script>
+</head>
+
+<body>
+	<div id="container">
+		<div id="mainpic">
+			<h1>Agri<span class="off">Events</span></h1>
+			<h2>A template by Bryant Smith</h2>
+		</div>
+
+		<div id="menu">
+			<ul>
+				<li class="menuitem"><a href="index.html">Home</a></li>
+				<li class="menuitem"><a href="organizer.html">Organizzatore</a></li>
+				<li class="menuitem"><a href="farmer.html">Agricoltore</a></li>
+			</ul>
+		</div>
+
+		<div id="content">
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+
+			<fieldset>
+				<legend>Inserisci offerte frutta ad evento</legend>
+
+				Agricoltori: <select id="selectFarmer" onchange="setFarmer();">
+				</select></br>
+				<button onclick="searchFarmers(this);">Cerca agricoltori</button>
+				</br></br>
+				Eventi: <select id="selectEvent" onchange="setEvent();">
+				</select></br>
+				<button id="searchEventsButton" onclick="searchEventsByFarmer(this);" disabled>Cerca eventi</button>
+
+				<table cellpadding="3">
+					<tr>
+						<td align="right">Agricoltore</td>
+						<td><input id="farmer" type="text" style="display:table-cell; width:100%" placeholder= "Mario_Rossi" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Evento</td>
+						<td><input id="event" type="text" style="display:table-cell; width:100%" placeholder= "Mercato_Città" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td align="right">Frutta (separata da una virgola)</td>
+						<td><input id="fruits" type="text" style="display:table-cell; width:100%" placeholder= "Apple,Grape" value="" autofocus></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><button onclick="insertOfferings(this);">Inserisci offerte</button></td>
+					</tr>
+				</table>
+			</fieldset>
+
+			<script>
+				function searchFarmers(srcElement){
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+
+					var selectFarmer = document.getElementById("selectFarmer");
+					selectFarmer.options.length = 0;
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(selectFarmer, summary){
+						this.n=0;
+						this.selectFarmer=selectFarmer;
+						this.summary=summary;
+
+						//Selezione Agricoltori
+						this.query = "PREFIX foaf:<http://xmlns.com/foaf/0.1/>"
+									+"SELECT ?person {"
+									+"	?person rdf:type foaf:Person"
+									+"} order by ?person";
+
+						//and methods to handle the query results
+						this.process = function(row){
+							var option = document.createElement("option");
+							option.text = row.person.value.substring(row.person.value.indexOf("#")+1);;
+							this.selectFarmer.add(option);
+
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							document.getElementById("selectFarmer").selectedIndex = 0;
+							document.getElementById("farmer").value = selectFarmer.options[selectFarmer.selectedIndex].value;
+							document.getElementById("searchEventsButton").disabled = false;
+
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(selectFarmer, summary));
+					//srcElement.disabled=true;
+				}
+
+				function setFarmer() {
+					var selectFarmer = document.getElementById("selectFarmer");
+					document.getElementById("farmer").value = selectFarmer.options[selectFarmer.selectedIndex].value;
+				}
+
+				function searchEventsByFarmer(srcElement){
+					var farmer=document.getElementById("farmer").value;
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+
+					var selectEvent = document.getElementById("selectEvent");
+					selectEvent.options.length = 0;
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(selectEvent, summary){
+						this.n=0;
+						this.selectEvent=selectEvent;
+						this.summary=summary;
+
+						//define the query
+						this.query = "PREFIX eve:<http://purl.org/NET/c4dm/event.owl#>"
+									+"PREFIX agreve:<http://www.semanticweb.org/agrievents-ontology#>"
+									+"PREFIX foaf:<http://xmlns.com/foaf/0.1/>"
+									+"SELECT DISTINCT ?event {"
+									+"	?event a eve:Event ."
+									+"	?person a foaf:Person ."
+									+"	?event eve:agent agreve:"+farmer
+									+"} ORDER BY ?event";
+
+						//and methods to handle the query results
+						this.process = function(row){
+							var option = document.createElement("option");
+							option.text = row.event.value.substring(row.event.value.indexOf("#")+1);;
+							this.selectEvent.add(option);
+
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							document.getElementById("selectEvent").selectedIndex = 0;
+							document.getElementById("event").value = selectEvent.options[selectEvent.selectedIndex].value;
+
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(selectEvent, summary));
+					//srcElement.disabled=true;
+				}
+
+				function setEvent() {
+					var selectEvent = document.getElementById("selectEvent");
+					document.getElementById("event").value = selectEvent.options[selectEvent.selectedIndex].value;
+				}
+
+				function insertOfferings(srcElement) {
+					var farmer=document.getElementById("farmer").value;
+					var event=document.getElementById("event").value;
+					var fruits=document.getElementById("fruits").value.split(",");
+
+					//prepare html elements to show the result
+					var container = srcElement.parentNode;
+					var title = document.createElement("h3");
+					title.innerHTML="Inserito";
+					container.insertBefore(title, srcElement);
+
+					var summary=document.createElement("p");
+					container.insertBefore(summary, srcElement);
+
+					//the query processor
+					function Processor(summary){
+						this.n=0;
+						this.summary=summary;
+
+						//Inserisci Offerta di Frutta
+						this.query = "PREFIX eve:<http://purl.org/NET/c4dm/event.owl#>"
+									+"PREFIX gr:<http://purl.org/goodrelations/v1#>"
+									+"PREFIX agreve:<http://www.semanticweb.org/agrievents-ontology#>"
+									+"PREFIX dbpedia:<http://dbpedia.org/resource/>";
+
+						for (var i=0; i<fruits.length; i++) {
+							this.query = this.query + "INSERT DATA {"
+													+"	agreve:Vendita_"+farmer+"_"+fruits[i]+" a owl:NamedIndividual ;"
+													+"											a gr:Offering ;"
+													+"											gr:includes dbpedia:"+fruits[i]+" ."
+													+"	agreve:"+farmer+" gr:offers agreve:Vendita_"+farmer+"_"+fruits[i]+" ."
+													+"	agreve:"+event+" eve:product agreve:Vendita_"+farmer+"_"+fruits[i]
+													+"};";
+						}
+
+						//and methods to handle the query results
+						this.process = function(row){
+							this.n++;
+						};
+
+						//show the results count as summary
+						this.flush = function(){
+							//this.summary.innerHTML="Found "+this.n+" items.";
+						};
+					}
+
+					//finally run the query
+					sparql_query("http://dydra.com/info-agrievents/agrievents/sparql", new Processor(summary));
+					//srcElement.disabled=true;
+				}
+			</script>
+
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+
+			<div id="footer"><h3><a href="http://www.bryantsmith.com">florida web design</a></div>
+		</div>
+	</div>
+</body>
+</html>
